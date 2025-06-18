@@ -1,0 +1,75 @@
+[
+  {
+    "name": "create-db",
+    "description": "Create a new SQLite database",
+    "method": "POST",
+    "endpoint": "/api/create-db",
+    "params": {
+      "db_name": "Name of the database to create"
+    }
+  },
+  {
+    "name": "execute-sql",
+    "description": "Execute a general SQL query on a specific database (e.g., SELECT, UPDATE, DELETE, INSERT, etc.)",
+    "method": "POST",
+    "endpoint": "/api/execute",
+    "params": {
+      "db_name": "Name of the database",
+      "query": "SQL query to execute"
+    }
+  },
+  
+  {
+    "name": "read-file",
+    "description": "Read a file from the file system",
+    "method": "POST",
+    "endpoint": "/api/read-file",
+    "params": {
+      "file_path": "Full path of the file to read"
+    }
+  },
+  {
+    "name": "write-file",
+    "description": "Write content to a file",
+    "method": "POST",
+    "endpoint": "/api/write-file",
+    "params": {
+      "file_path": "Full path to the file",
+      "content": "Content to write"
+    }
+  },
+  {
+    "name": "view-available-doctors",
+    "description": "Retrieve doctors available at a given time slot",
+    "method": "POST",
+    "endpoint": "/api/view-available",
+    "params": {
+      "time": "Time slot to check (e.g., '10:00')"
+    }
+  },
+ 
+
+  {
+  "name": "book-appointment-existing",
+  "description": "Book appointment for existing patient with doctor at given time",
+  "method": "POST",
+  "endpoint": "/api/book-existing",
+  "params": {
+    "db_name": "mcp",
+    "doctor_id": "Doctor's ID",
+    "patient_id": "Patient's ID",
+    "time": "Desired appointment time"
+  }
+},
+
+  {
+    "name": "view-appointments",
+    "description": "View all appointments with doctor and patient names",
+    "method": "POST",
+    "endpoint": "/api/view-appointments",
+    "params": {}
+  }
+ 
+
+]
+

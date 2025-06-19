@@ -4,7 +4,9 @@
 A full-stack intelligent hospital appointment management system powered by React, Node.js, PostgreSQL, and Mistral LLM (via Ollama).
 ## 🔥 Preview
 
+### 🎥 Demo Video
 
+[▶️ Click here to watch the demo](./MCP_DEMO.webm)
 
 ### 🏠 Dashboard  
 ![Dashboard](./home2.png)

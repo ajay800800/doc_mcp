@@ -343,10 +343,11 @@ exports.simpleLlmReply = async (req, res) => {
 };
 
 exports.bookAppointmentWithExistingPatient = async (req, res) => {
-  const { doctor_id, patient_id, time } = req.body;
+  let { doctor_id, patient_id, time} = req.body;
   if (!doctor_id || !patient_id || !time) {
     return res.status(400).json({ error: 'Missing doctor_id, patient_id, or time' });
   }
+  time = time.replace(/^'+|'+$/g, '');
 
   const { Pool } = require('pg');
   const pool = new Pool(config.PG_CONFIG);

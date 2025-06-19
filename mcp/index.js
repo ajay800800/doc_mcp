@@ -4,7 +4,7 @@ const handlers = require('./handlers');
 
 
 router.post('/simple-llm', handlers.simpleLlmReply); //
-router.post('/api/book-existing', handlers.bookAppointmentWithExistingPatient);
+router.post('/book-existing', handlers.bookAppointmentWithExistingPatient);
 
 
 router.post('/create-db', handlers.createDatabase);

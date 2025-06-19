@@ -55,7 +55,7 @@
   "method": "POST",
   "endpoint": "/api/book-existing",
   "params": {
-    "db_name": "mcp",
+   
     "doctor_id": "Doctor's ID",
     "patient_id": "Patient's ID",
     "time": "Desired appointment time"

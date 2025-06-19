@@ -6,55 +6,6 @@ const config = require('./config/config');
 
 const pool = new Pool(config.PG_CONFIG);
 
-// ✅ Register
-// ✅ Register a new user
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-
-export default function RegisterPage() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const navigate = useNavigate(); // ✅
-
-  const handleRegister = async () => {
-    if (!username || !password) {
-      alert('Username and password are required');
-      return;
-    }
-
-    try {
-      const res = await axios.post('/api/register', { username, password });
-      if (res.data.message) {
-        alert('✅ Registered successfully!');
-        navigate('/'); // ✅ Redirect to home page (login screen)
-      } else {
-        alert('Something went wrong during registration');
-      }
-    } catch (err) {
-      alert(err.response?.data?.error || 'Registration failed');
-    }
-  };
-
-  return (
-    <div className="form-container">
-      <h2>📝 Register</h2>
-      <input
-        type="text"
-        placeholder="Enter username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Create password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button onClick={handleRegister}>Register</button>
-    </div>
-  );
-}
 
 // ✅ Login
 router.post('/login', async (req, res) => {

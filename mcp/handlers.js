@@ -5,7 +5,7 @@ const files = require('../services/fileManager');
 const log = require('../services/logger');
 const validate = require('../utils/validators');
 const axios = require('axios');
-const config = require('../config/config');
+
 const path = require('path');
 const fs = require('fs');
 

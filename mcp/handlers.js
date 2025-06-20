@@ -1,4 +1,5 @@
-
+const config = require('../config/config');
+const { Pool } = require('pg');
 const db = require('../services/database');
 const files = require('../services/fileManager');
 const log = require('../services/logger');

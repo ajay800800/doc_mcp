@@ -21,7 +21,10 @@ module.exports = {
     host: process.env.PGHOST || 'localhost',
     database: process.env.PGDATABASE || 'mcp',
     password: process.env.PGPASSWORD || 'mcppass',
-    port: process.env.PGPORT ? parseInt(process.env.PGPORT) : 5432
+    port: process.env.PGPORT ? parseInt(process.env.PGPORT) : 5432,
+    ssl: {
+      rejectUnauthorized: false
+    }
   },
   LOG_FILE: './logs/operations.log',
   PORT: process.env.PORT || 3007,

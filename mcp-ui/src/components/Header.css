@@ -1,0 +1,20 @@
+.header {
+  background: #e7eaee;
+  color: rgb(214, 45, 45);
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-links a {
+  margin-left: 1rem;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.nav-links a:hover {
+  color: #aad8ff;
+}

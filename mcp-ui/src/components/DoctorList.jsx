@@ -5,7 +5,7 @@ export default function DoctorList() {
   const [doctors, setDoctors] = useState([]);
 
   useEffect(() => {
-    axios.post('/api/execute', { db_name: 'mcp', query: 'SELECT * FROM doctors;' })
+    axios.post('https://doc-mcp.onrender.com/api/execute', { db_name: 'mcp', query: 'SELECT * FROM doctors;' })
       .then(res => setDoctors(res.data.result));
   }, []);
 

@@ -5,7 +5,7 @@ export default function AppointmentList() {
   const [appointments, setAppointments] = useState([]);
 
   useEffect(() => {
-    axios.post('/api/view-appointments')
+    axios.post('https://doc-mcp.onrender.com/api/view-appointments')
       .then(res => setAppointments(res.data.appointments));
   }, []);
 

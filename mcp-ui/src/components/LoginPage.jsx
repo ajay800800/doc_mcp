@@ -11,7 +11,7 @@ export default function LoginPage({ setIsAuthenticated }) {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/api/login', { username, password });
+      await axios.post('https://doc-mcp.onrender.com/api/login', { username, password });
       setIsAuthenticated(true);
       navigate('/');  // redirect to home page
     } catch (err) {

@@ -16,7 +16,7 @@ export default function Register() {
     }
 
     try {
-      const res = await axios.post('/api/register', { username, password });
+      const res = await axios.post('https://doc-mcp.onrender.com/api/register', { username, password });
       setMessage(res.data.message || '✅ Registered');
 
       // ⏳ Optional: wait a moment, then navigate to login

@@ -336,11 +336,14 @@ User command:
         },
       }
     );
-       
-    const responseText = llmResponse.data.choices?.[0]?.message?.content || '';
+        console.log(llmResponse);
+
+    const responseText = llmResponse.data.response || '';
+
+    // const responseText = llmResponse.data.choices?.[0]?.message?.content || '';
     log.write(`LLM raw response: ${responseText}`);
     console.log(responseText);
-  // responseText = LLMResponse.replace(/```json\n?/gi, '').replace(/```/g, '').trim();
+  responseText = ResponseText.replace(/```json\n?/gi, '').replace(/```/g, '').trim();
  let cleanJson = responseText
       .replace(/\\'/g, "'")
       .replace(/'"\[/g, '["')

@@ -80,6 +80,168 @@ exports.writeFile = (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 };
+// exports.askLLM = async (req, res) => {
+//   const { prompt } = req.body;
+//   if (!prompt || typeof prompt !== 'string') {
+//     return res.status(400).json({ error: 'Invalid or missing prompt' });
+//   }
+
+//   try {
+//     const toolsPath = path.join(__dirname, '../tools.json');
+//     const tools = JSON.parse(fs.readFileSync(toolsPath, 'utf-8'));
+
+//     const formattedTools = tools.map(tool => {
+//       return `- ${tool.name}: ${tool.description}\n  Method: ${tool.method}\n  Endpoint: ${tool.endpoint}\n  Params: ${JSON.stringify(tool.params)}`;
+//     }).join('\n\n');
+
+//     // 🧠 Context to teach LLM correct SQL and formatting
+//     const dbContext = `
+// You are working with a PostgreSQL database named "mcp". It contains:
+
+// 1. doctors
+//    - doctor_id SERIAL PRIMARY KEY
+//    - name TEXT
+//    - department TEXT
+//    - available_slots JSONB (e.g. ["10:00", "11:00"])
+
+// 2. patients
+//    - patient_id SERIAL PRIMARY KEY
+//    - name TEXT
+//    - age INTEGER
+//    - contact TEXT
+
+// 3. appointments
+//    - appointment_id SERIAL PRIMARY KEY
+//    - doctor_id INTEGER (FK → doctors)
+//    - patient_id INTEGER (FK → patients)
+//    - appointment_time TEXT
+
+// 🔍 Important SQL rules:
+// - To find doctors available at a given time, use:
+//   SELECT * FROM doctors WHERE available_slots @> '[\"10:00\"]';
+
+// ✅ Valid SQL example:
+//   "query": "SELECT * FROM doctors WHERE available_slots @> '[\\\"10:00\\\"]';"
+
+// ❌ DO NOT USE:
+// - JavaScript string concatenation: '" + time + "'
+// - Over-escaped JSON like '[\\'10:00\\']'
+// - Single-quoted values inside JSON array
+// - Any "+" signs or mixing of variables in SQL
+
+// ✅ Always return a plain SQL string as value of "query", inside:
+//   {
+//     "tool": "tool-name",
+//     "params": {
+//       "db_name": "mcp",
+//       "query": "valid SQL here"
+//     }
+//   }
+
+// 📦 Response format:
+// Return ONLY a **pure JSON array  of only one Tool   ** (no markdown, no explanations) like one tool query can be run when required.
+
+// [
+//   {
+//     "tool": "tool-name",
+//     "params": {
+//       ...
+//     }
+//   }
+// ]
+// `;
+
+//     const llmPrompt = `
+// You are a smart backend assistant that helps choose tool and compose SQL commands only when required , call only required tool not unneccesarry tool .
+
+// ${dbContext}
+
+// Available tools:
+// ${formattedTools}
+
+// User command:
+// "${prompt}"
+// `;
+
+//    // 🔁 Send to Together.ai LLM
+// const llmResponse = await axios.post(
+//   "https://api.together.xyz/v1/chat/completions",
+//   {
+//     model: "lgai/exaone-3-5-32b-instruct",
+//     messages: [{ role: "user", content: llmPrompt }],
+//   },
+//   {
+//     headers: {
+//       "Authorization": "Bearer tgp_v1_aKtx9-ZHcdyhii7FSnfbyOuFVKEyeYzx_Wm407i9--U", // 👈 Use Together.ai token
+//       "Content-Type": "application/json",
+//     },
+//   }
+// );
+
+
+
+//     const responseText = llmResponse.data.response || '';
+//     console.log("🔍 LLM replied:", responseText);
+//     log.write(`LLM raw response: ${responseText}`);
+
+//     // 🧹 Fix bad quote handling from LLM
+//     let cleanJson = responseText
+//       .replace(/\\'/g, "'")
+//       .replace(/'"\[/g, '["')
+//       .replace(/\]\"'/g, ']')
+//       .replace(/@>\s*'\[\\""\s*\+\s*["']([^"']+)["']\s*\+\s*\\""\]';?/g, "@> '[\"$1\"]';")
+//       .replace(/@>\s*'\[\\?'"\s*\+\s*["']([^"']+)["']\s*\+\s*\\?"'\]';?/g, "@> '[\"$1\"]';")
+//       .replace(/@>\s*'?\[\\"?'?\s*\+\s*["']([^"']+)["']\s*\+\s*\\"?'?\]';?/g, "@> '[\"$1\"]';");
+
+//     // ✅ Parse JSON
+//     let toolCalls;
+//     try {
+//       toolCalls = JSON.parse(cleanJson);
+//       if (!Array.isArray(toolCalls)) toolCalls = [toolCalls];
+//     } catch (e) {
+//       return res.status(400).json({ error: "Invalid JSON from LLM", raw: responseText });
+//     }
+
+//     // 🔄 Execute tool calls
+//     let results=[];
+//     for (const { tool, params } of toolCalls) {
+//       const toolInfo = tools.find(t => t.name === tool);
+//       if (!toolInfo) {
+//         results.push({ tool, error: "Tool not found" });
+//         continue;
+//       }
+
+      
+//     const BACKEND_URL = 'https://doc-mcp.onrender.com'; // ✅ Replace with your actual backend base URL
+
+// try {
+//   const apiURL = `${BACKEND_URL}${toolInfo.endpoint}`;
+//   const result = await axios({
+//     method: toolInfo.method.toLowerCase(),
+//     url: apiURL,
+//     data: params
+//   });
+//   results.push(result.data);
+// } catch (err) {
+//   results.push({ tool, error: err.message });
+// }
+//   }
+
+
+
+//     return res.json({ results });
+
+//   } catch (err) {
+//     return res.status(500).json({ error: "askLLM failed: " + err.message });
+//   }
+// };
+
+
+const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
+const log = require('../utils/log'); // Make sure your log module exists
+
 exports.askLLM = async (req, res) => {
   const { prompt } = req.body;
   if (!prompt || typeof prompt !== 'string') {
@@ -94,7 +256,6 @@ exports.askLLM = async (req, res) => {
       return `- ${tool.name}: ${tool.description}\n  Method: ${tool.method}\n  Endpoint: ${tool.endpoint}\n  Params: ${JSON.stringify(tool.params)}`;
     }).join('\n\n');
 
-    // 🧠 Context to teach LLM correct SQL and formatting
     const dbContext = `
 You are working with a PostgreSQL database named "mcp". It contains:
 
@@ -121,25 +282,15 @@ You are working with a PostgreSQL database named "mcp". It contains:
   SELECT * FROM doctors WHERE available_slots @> '[\"10:00\"]';
 
 ✅ Valid SQL example:
-  "query": "SELECT * FROM doctors WHERE available_slots @> '[\\\"10:00\\\"]';"
-
-❌ DO NOT USE:
-- JavaScript string concatenation: '" + time + "'
-- Over-escaped JSON like '[\\'10:00\\']'
-- Single-quoted values inside JSON array
-- Any "+" signs or mixing of variables in SQL
-
-✅ Always return a plain SQL string as value of "query", inside:
   {
-    "tool": "tool-name",
+    "tool": "execute-sql",
     "params": {
       "db_name": "mcp",
-      "query": "valid SQL here"
+      "query": "SELECT * FROM doctors WHERE available_slots @> '[\\\"10:00\\\"]';"
     }
   }
 
-📦 Response format:
-Return ONLY a **pure JSON array  of only one Tool   ** (no markdown, no explanations) like one tool query can be run when required.
+📦 Response format (return only ONE tool call, no markdown, no explanation):
 
 [
   {
@@ -152,7 +303,7 @@ Return ONLY a **pure JSON array  of only one Tool   ** (no markdown, no explanat
 `;
 
     const llmPrompt = `
-You are a smart backend assistant that helps choose tool and compose SQL commands only when required , call only required tool not unneccesarry tool .
+You are a backend assistant who suggests one tool to use with correct SQL if needed.
 
 ${dbContext}
 
@@ -163,78 +314,62 @@ User command:
 "${prompt}"
 `;
 
-   // 🔁 Send to Together.ai LLM
-const llmResponse = await axios.post(
-  "https://api.together.xyz/v1/chat/completions",
-  {
-    model: "lgai/exaone-3-5-32b-instruct",
-    messages: [{ role: "user", content: llmPrompt }],
-  },
-  {
-    headers: {
-      "Authorization": "Bearer tgp_v1_aKtx9-ZHcdyhii7FSnfbyOuFVKEyeYzx_Wm407i9--U", // 👈 Use Together.ai token
-      "Content-Type": "application/json",
-    },
-  }
-);
+    // 🔁 Send to Together.ai
+    const llmResponse = await axios.post(
+      "https://api.together.xyz/v1/chat/completions",
+      {
+        model: "lgai/exaone-3-5-32b-instruct",
+        messages: [{ role: "user", content: llmPrompt }],
+      },
+      {
+        headers: {
+          Authorization: "Bearer tgp_v1_aKtx9-ZHcdyhii7FSnfbyOuFVKEyeYzx_Wm407i9--U",
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-
-
-    const responseText = llmResponse.data.response || '';
-    console.log("🔍 LLM replied:", responseText);
+    const responseText = llmResponse.data.choices?.[0]?.message?.content || '';
     log.write(`LLM raw response: ${responseText}`);
 
-    // 🧹 Fix bad quote handling from LLM
-    let cleanJson = responseText
-      .replace(/\\'/g, "'")
-      .replace(/'"\[/g, '["')
-      .replace(/\]\"'/g, ']')
-      .replace(/@>\s*'\[\\""\s*\+\s*["']([^"']+)["']\s*\+\s*\\""\]';?/g, "@> '[\"$1\"]';")
-      .replace(/@>\s*'\[\\?'"\s*\+\s*["']([^"']+)["']\s*\+\s*\\?"'\]';?/g, "@> '[\"$1\"]';")
-      .replace(/@>\s*'?\[\\"?'?\s*\+\s*["']([^"']+)["']\s*\+\s*\\"?'?\]';?/g, "@> '[\"$1\"]';");
-
-    // ✅ Parse JSON
     let toolCalls;
     try {
-      toolCalls = JSON.parse(cleanJson);
+      toolCalls = JSON.parse(responseText.trim());
       if (!Array.isArray(toolCalls)) toolCalls = [toolCalls];
     } catch (e) {
-      return res.status(400).json({ error: "Invalid JSON from LLM", raw: responseText });
+      return res.status(400).json({ error: '❌ Invalid JSON from LLM', raw: responseText });
     }
 
-    // 🔄 Execute tool calls
-    let results=[];
+    const BACKEND_URL = 'https://doc-mcp.onrender.com';
+    const results = [];
+
     for (const { tool, params } of toolCalls) {
       const toolInfo = tools.find(t => t.name === tool);
       if (!toolInfo) {
-        results.push({ tool, error: "Tool not found" });
+        results.push({ tool, error: 'Tool not found in tools.json' });
         continue;
       }
 
-      
-    const BACKEND_URL = 'https://doc-mcp.onrender.com'; // ✅ Replace with your actual backend base URL
-
-try {
-  const apiURL = `${BACKEND_URL}${toolInfo.endpoint}`;
-  const result = await axios({
-    method: toolInfo.method.toLowerCase(),
-    url: apiURL,
-    data: params
-  });
-  results.push(result.data);
-} catch (err) {
-  results.push({ tool, error: err.message });
-}
-  }
-
-
+      try {
+        const apiURL = `${BACKEND_URL}${toolInfo.endpoint}`;
+        const result = await axios({
+          method: toolInfo.method.toLowerCase(),
+          url: apiURL,
+          data: params
+        });
+        results.push(result.data);
+      } catch (err) {
+        results.push({ tool, error: err.message });
+      }
+    }
 
     return res.json({ results });
 
   } catch (err) {
-    return res.status(500).json({ error: "askLLM failed: " + err.message });
+    return res.status(500).json({ error: 'askLLM failed: ' + err.message });
   }
 };
+
 exports.viewAvailableDoctors = async (req, res) => {
   const { time } = req.body;
   if (!time) return res.status(400).json({ error: 'Missing time parameter' });

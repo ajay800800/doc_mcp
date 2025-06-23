@@ -7,6 +7,29 @@ const config = require('./config/config');
 const pool = new Pool(config.PG_CONFIG);
 
 
+
+// ✅ Register endpoint
+router.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) return res.status(400).json({ error: 'Username and password required' });
+
+  try {
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Insert into users table
+    await pool.query(
+      'INSERT INTO users (username, password) VALUES ($1, $2)',
+      [username, hashedPassword]
+    );
+
+    return res.json({ message: '✅ Registered successfully' });
+  } catch (err) {
+    return res.status(500).json({ error: '❌ Registration failed: ' + err.message });
+  }
+});
+
+
 // ✅ Login
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;

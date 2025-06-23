@@ -211,18 +211,23 @@ const llmResponse = await axios.post(
         continue;
       }
 
-      try {
-        const apiURL = `http://localhost:${config.PORT || 3001}${toolInfo.endpoint}`;
-        const result = await axios({
-          method: toolInfo.method.toLowerCase(),
-          url: apiURL,
-          data: params
-        });
-        results.push(result.data );
-      } catch (err) {
-        results.push({ tool, error: err.message });
-      }
-    }
+      
+    const BACKEND_URL = 'https://doc-mcp.onrender.com'; // ✅ Replace with your actual backend base URL
+
+try {
+  const apiURL = `${BACKEND_URL}${toolInfo.endpoint}`;
+  const result = await axios({
+    method: toolInfo.method.toLowerCase(),
+    url: apiURL,
+    data: params
+  });
+  results.push(result.data);
+} catch (err) {
+  results.push({ tool, error: err.message });
+}
+  }
+
+
 
     return res.json({ results });
 

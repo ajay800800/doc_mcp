@@ -28,7 +28,7 @@ export default function LLMChat() {
     setLoading(true);
 
     try {
-      const endpoint = useTools ? '/api/ask-llm' : '/api/simple-llm';
+      const endpoint = useTools ? 'https://doc-mcp.onrender.com/api/ask-llm' : 'https://doc-mcp.onrender.com/api/simple-llm';
       const res = await axios.post(endpoint, { prompt: userMsg.text });
       const rawReply = res.data;
 

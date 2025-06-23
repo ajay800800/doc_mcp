@@ -7,7 +7,7 @@ export default function AddDoctor() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const query = `INSERT INTO doctors (name, department, available_slots) VALUES ('${form.name}', '${form.department}', '${form.slots}'::jsonb);`;
-    await axios.post('/api/execute', { db_name: 'mcp', query });
+    await axios.post('https://doc-mcp.onrender.com/api/execute', { db_name: 'mcp', query });
     alert('Doctor added!');
   };
 

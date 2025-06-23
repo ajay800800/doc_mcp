@@ -8,7 +8,7 @@ const config = require('../config/config');
 const path = require('path');
 const fs = require('fs');
 
-const API_BASE = "https://doc_mcp.onrender.com";
+const API_BASE = "https://doc-mcp.onrender.com";
 // Create a new database
 exports.createDatabase = (req, res) => {
   const { db_name } = req.body;
@@ -237,10 +237,6 @@ exports.writeFile = (req, res) => {
 // };
 
 
-const axios = require('axios');
-const fs = require('fs');
-const path = require('path');
-const log = require('../utils/log'); // Make sure your log module exists
 
 exports.askLLM = async (req, res) => {
   const { prompt } = req.body;

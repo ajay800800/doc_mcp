@@ -21,12 +21,9 @@ module.exports = {
     host: process.env.PGHOST || 'localhost',
     database: process.env.PGDATABASE || 'mcp',
     password: process.env.PGPASSWORD || 'mcppass',
-    port: process.env.PGPORT ? parseInt(process.env.PGPORT) : 5432,
-    ssl: {
-      rejectUnauthorized: false
-    }
+    port: process.env.PGPORT ? parseInt(process.env.PGPORT) : 5432
   },
   LOG_FILE: './logs/operations.log',
   PORT: process.env.PORT || 3007,
-  LLM_API_URL: process.env.LLM_API_URL || 'http://localhost:11434/api/generate'
+  LLM_API_URL: process.env.LLM_API_URL || 'https://eighty-falcons-guess.loca.lt/api/generate'
 };

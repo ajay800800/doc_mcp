@@ -338,7 +338,7 @@ User command:
     );
         console.log(llmResponse);
 
-    const responseText = llmResponse.data.response || '';
+    let responseText = llmResponse.data.response || '';
 
     // const responseText = llmResponse.data.choices?.[0]?.message?.content || '';
     log.write(`LLM raw response: ${responseText}`);

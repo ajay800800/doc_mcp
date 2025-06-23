@@ -1,14 +1,14 @@
-const config = require('../config/config');
-const { Pool } = require('pg');
+
 const db = require('../services/database');
 const files = require('../services/fileManager');
 const log = require('../services/logger');
 const validate = require('../utils/validators');
 const axios = require('axios');
-
+const config = require('../config/config');
 const path = require('path');
 const fs = require('fs');
 
+const API_BASE = "https://doc_mcp.onrender.com";
 // Create a new database
 exports.createDatabase = (req, res) => {
   const { db_name } = req.body;
@@ -163,12 +163,22 @@ User command:
 "${prompt}"
 `;
 
-    // 🔁 Send to local LLM or Ollama
-    const llmResponse = await axios.post(config.LLM_API_URL, {
-      model: "mistral",
-      prompt: llmPrompt,
-      stream: false
-    });
+   // 🔁 Send to Together.ai LLM
+const llmResponse = await axios.post(
+  "https://api.together.xyz/v1/chat/completions",
+  {
+    model: "lgai/exaone-3-5-32b-instruct",
+    messages: [{ role: "user", content: llmPrompt }],
+  },
+  {
+    headers: {
+      "Authorization": "Bearer tgp_v1_aKtx9-ZHcdyhii7FSnfbyOuFVKEyeYzx_Wm407i9--U", // 👈 Use Together.ai token
+      "Content-Type": "application/json",
+    },
+  }
+);
+
+
 
     const responseText = llmResponse.data.response || '';
     console.log("🔍 LLM replied:", responseText);
@@ -325,20 +335,28 @@ exports.simpleLlmReply = async (req, res) => {
   }
 
   try {
-    const llmResponse = await axios.post(config.LLM_API_URL, {
-      model: "mistral", // or "gemma"
-      prompt,
-      stream: false
-    });
+    const llmResponse = await axios.post(
+      'https://api.together.xyz/v1/chat/completions',
+      {
+        model: 'lgai/exaone-3-5-32b-instruct',
+        messages: [{ role: 'user', content: prompt }],
+      },
+      {
+        headers: {
+          'Authorization': 'Bearer tgp_v1_aKtx9-ZHcdyhii7FSnfbyOuFVKEyeYzx_Wm407i9--U',
+          'Content-Type': 'application/json'
+        }
+      }
+    );
 
-    const response = llmResponse.data.response || '';
+    const response = llmResponse.data.choices?.[0]?.message?.content || '';
     log.write(`SimpleLLM: ${prompt} → ${response}`);
 
-    // ✅ Return as plain text
     res.setHeader('Content-Type', 'text/plain');
     return res.send(response.trim());
 
   } catch (err) {
+    console.error('❌ LLM Error:', err.message);
     return res.status(500).send('❌ LLM Error: ' + err.message);
   }
 };

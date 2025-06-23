@@ -278,15 +278,25 @@ You are working with a PostgreSQL database named "mcp". It contains:
   SELECT * FROM doctors WHERE available_slots @> '[\"10:00\"]';
 
 ✅ Valid SQL example:
+  "query": "SELECT * FROM doctors WHERE available_slots @> '[\\\"10:00\\\"]';"
+
+❌ DO NOT USE:
+- JavaScript string concatenation: '" + time + "'
+- Over-escaped JSON like '[\\'10:00\\']'
+- Single-quoted values inside JSON array
+- Any "+" signs or mixing of variables in SQL
+
+✅ Always return a plain SQL string as value of "query", inside:
   {
-    "tool": "execute-sql",
+    "tool": "tool-name",
     "params": {
       "db_name": "mcp",
-      "query": "SELECT * FROM doctors WHERE available_slots @> '[\\\"10:00\\\"]';"
+      "query": "valid SQL here"
     }
   }
 
-📦 Response format (return only ONE tool call, no markdown, no explanation):
+📦 Response format:
+Return ONLY a **pure JSON array  of only one Tool   ** (no markdown, no explanations) like one tool query can be run when required.
 
 [
   {
@@ -299,7 +309,7 @@ You are working with a PostgreSQL database named "mcp". It contains:
 `;
 
     const llmPrompt = `
-You are a backend assistant who suggests one tool to use with correct SQL if needed.
+You are a smart backend assistant that helps choose tool and compose SQL commands only when required , call only required tool not unneccesarry tool .
 
 ${dbContext}
 
@@ -309,6 +319,7 @@ ${formattedTools}
 User command:
 "${prompt}"
 `;
+
 
     // 🔁 Send to Together.ai
     const llmResponse = await axios.post(

@@ -340,7 +340,7 @@ User command:
     const responseText = llmResponse.data.choices?.[0]?.message?.content || '';
     log.write(`LLM raw response: ${responseText}`);
 
-  responseText = LLMResponse.replace(/```json\n?/gi, '').replace(/```/g, '').trim();
+  // responseText = LLMResponse.replace(/```json\n?/gi, '').replace(/```/g, '').trim();
  let cleanJson = responseText
       .replace(/\\'/g, "'")
       .replace(/'"\[/g, '["')

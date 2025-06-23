@@ -28,5 +28,5 @@ module.exports = {
   },
   LOG_FILE: './logs/operations.log',
   PORT: process.env.PORT || 3007,
-  LLM_API_URL: process.env.LLM_API_URL || 'https://eighty-falcons-guess.loca.lt/api/generate'
+  LLM_API_URL: process.env.LLM_API_URL || 'https://mines-pg-president-morrison.trycloudflare.com/api/generate'
 };

@@ -524,7 +524,7 @@ exports.simpleLlmReply = async (req, res) => {
 const llmResponse = await axios.post(
   "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3",
   {
-    inputs: `<s>[INST] ${Prompt} [/INST]`
+    inputs: `<s>[INST] ${prompt} [/INST]`
   },
   {
     headers: {

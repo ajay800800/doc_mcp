@@ -339,17 +339,8 @@ const response = await axios.post(
   }
 );
 
-// Mistral response format
-console.log(response.data);
 let responseText = response.data?.[0]?.generated_text || '';
 
-        // console.log(responseText);
-
-    // let responseText = llmResponse.data.response || '';
-
-    // const responseText = llmResponse.data.choices?.[0]?.message?.content || '';
-    log.write(`LLM raw response: ${responseText}`);
-    console.log(responseText);
   responseText = responseText.replace(/```json\n?/gi, '').replace(/```/g, '').trim();
  let cleanJson = responseText
       .replace(/\\'/g, "'")
@@ -361,6 +352,14 @@ let responseText = response.data?.[0]?.generated_text || '';
 
     // ✅ Parse JSON
     
+// Step 3: Extract only a single valid JSON array using regex
+const jsonMatch = cleanJson.match(/\[\s*{[\s\S]*?}\s*]/);
+
+if (!jsonMatch) {
+  return res.status(400).json({ error: "❌ No valid JSON array found", raw: cleanJson });
+}
+
+
     let toolCalls;
     try {
       toolCalls = JSON.parse(cleanJson);

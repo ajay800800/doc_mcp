@@ -506,33 +506,33 @@ exports.simpleLlmReply = async (req, res) => {
   }
 
   try {
-    // const llmResponse = await axios.post(
-    //   'https://api.together.xyz/v1/chat/completions',
-    //   {
-    //     model: 'lgai/exaone-3-5-32b-instruct',
-    //     messages: [{ role: 'user', content: prompt }],
-    //   },
-    //   {
-    //     headers: {
-    //       'Authorization': 'Bearer tgp_v1_aKtx9-ZHcdyhii7FSnfbyOuFVKEyeYzx_Wm407i9--U',
-    //       'Content-Type': 'application/json'
-    //     }
-    //   }
-    // );
+    const llmResponse = await axios.post(
+      'https://api.together.xyz/v1/chat/completions',
+      {
+        model: 'lgai/exaone-3-5-32b-instruct',
+        messages: [{ role: 'user', content: prompt }],
+      },
+      {
+        headers: {
+          'Authorization': 'Bearer tgp_v1_aKtx9-ZHcdyhii7FSnfbyOuFVKEyeYzx_Wm407i9--U',
+          'Content-Type': 'application/json'
+        }
+      }
+    );
 
 
-const llmResponse = await axios.post(
-  "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3",
-  {
-    inputs: `<s>[INST] ${prompt} [/INST]`
-  },
-  {
-    headers: {
-      Authorization: `Bearer ${process.env.HF_API_KEY}`,
-      "Content-Type": "application/json",
-    }
-  }
-);
+// const llmResponse = await axios.post(
+//   "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3",
+//   {
+//     inputs: `<s>[INST] ${prompt} [/INST]`
+//   },
+//   {
+//     headers: {
+//       Authorization: `Bearer ${process.env.HF_API_KEY}`,
+//       "Content-Type": "application/json",
+//     }
+//   }
+// );
 
 
     

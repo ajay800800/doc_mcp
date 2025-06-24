@@ -326,7 +326,7 @@ User command:
     const llmResponse = await axios.post(
       "https://api.together.xyz/v1/chat/completions",
       {
-        model: "lgai/exaone-3-5-32b-instruct",
+        model: "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free",
         messages: [{ role: "user", content: llmPrompt }],
       },
       {

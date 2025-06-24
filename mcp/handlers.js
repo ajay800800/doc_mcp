@@ -322,23 +322,29 @@ User command:
 `;
 
 
-    // 🔁 Send to Together.ai
-    const llmResponse = await axios.post(
-      "https://api.together.xyz/v1/chat/completions",
-      {
-        model: "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free",
-        messages: [{ role: "user", content: llmPrompt }],
-      },
-      {
-        headers: {
-          Authorization: "Bearer tgp_v1_aKtx9-ZHcdyhii7FSnfbyOuFVKEyeYzx_Wm407i9--U",
-          "Content-Type": "application/json",
-        },
-      }
-    );
+ 
+
+
+
+const response = await axios.post(
+  "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3",
+  {
+    inputs: `<s>[INST] ${llmPrompt} [/INST]`
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${process.env.HF_API_KEY}`,
+      "Content-Type": "application/json",
+    }
+  }
+);
+
+// Mistral response format
+let responseText = response.data?.[0]?.generated_text || '';
+
         console.log(llmResponse);
 
-    let responseText = llmResponse.data.response || '';
+    // let responseText = llmResponse.data.response || '';
 
     // const responseText = llmResponse.data.choices?.[0]?.message?.content || '';
     log.write(`LLM raw response: ${responseText}`);

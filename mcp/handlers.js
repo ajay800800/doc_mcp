@@ -338,73 +338,67 @@ const response = await axios.post(
     }
   }
 );
-
 let responseText = response.data?.[0]?.generated_text || '';
 
-  responseText = responseText.replace(/```json\n?/gi, '').replace(/```/g, '').trim();
- let cleanJson = responseText
-      .replace(/\\'/g, "'")
-      .replace(/'"\[/g, '["')
-      .replace(/\]\"'/g, ']')
-      .replace(/@>\s*'\[\\""\s*\+\s*["']([^"']+)["']\s*\+\s*\\""\]';?/g, "@> '[\"$1\"]';")
-      .replace(/@>\s*'\[\\?'"\s*\+\s*["']([^"']+)["']\s*\+\s*\\?"'\]';?/g, "@> '[\"$1\"]';")
-      .replace(/@>\s*'?\[\\"?'?\s*\+\s*["']([^"']+)["']\s*\+\s*\\"?'?\]';?/g, "@> '[\"$1\"]';");
+// Step 1: Strip code block markers like ```json or ```
+responseText = responseText.replace(/```json\n?|```/gi, '').trim();
 
-    // ✅ Parse JSON
-    
-// Step 3: Extract only a single valid JSON array using regex
-const jsonMatch = cleanJson.match(/\[\s*{[\s\S]*?}\s*]/);
+// Step 2: Clean problematic characters (optional but helpful)
+let cleanJson = responseText
+  .replace(/\\'/g, "'")
+  .replace(/'"\[/g, '["')
+  .replace(/\]\"'/g, ']')
+  .replace(/@>\s*'\[\\""\s*\+\s*["']([^"']+)["']\s*\+\s*\\""\]';?/g, "@> '[\"$1\"]';")
+  .replace(/@>\s*'\[\\?'"\s*\+\s*["']([^"']+)["']\s*\+\s*\\?"'\]';?/g, "@> '[\"$1\"]';")
+  .replace(/@>\s*'?\[\\"?'?\s*\+\s*["']([^"']+)["']\s*\+\s*\\"?'?\]';?/g, "@> '[\"$1\"]';");
 
-if (!jsonMatch) {
+// Step 3: Extract the last JSON array only
+const jsonArrays = cleanJson.match(/\[[\s\S]*?\]/g);
+if (!jsonArrays || jsonArrays.length === 0) {
   return res.status(400).json({ error: "❌ No valid JSON array found", raw: cleanJson });
 }
 
+const jsonToParse = jsonArrays[jsonArrays.length - 1];
 
-    let toolCalls;
-    try {
-      toolCalls = JSON.parse(cleanJson);
-      if (!Array.isArray(toolCalls)) toolCalls = [toolCalls];
-    } catch (e) {
-      return res.status(400).json({ error: "Invalid JSON from LLM", raw: responseText });
-    }
+// Step 4: Parse the extracted JSON
+let toolCalls;
+try {
+  toolCalls = JSON.parse(jsonToParse);
+  if (!Array.isArray(toolCalls)) toolCalls = [toolCalls];
+} catch (e) {
+  return res.status(400).json({ error: "❌ Invalid JSON from LLM", raw: jsonToParse });
+}
+const BACKEND_URL = 'https://doc-mcp.onrender.com';
+const results = [];
 
-    // ✅ Parse JSON
-    // let toolCalls;
-    // try {
-    //   toolCalls = JSON.parse(responseText.trim());
-    //   if (!Array.isArray(toolCalls)) toolCalls = [toolCalls];
-    // } catch (e) {
-    //   return res.status(400).json({ error: '❌ Invalid JSON from LLM', raw: responseText });
-    // }
+for (const { tool, params } of toolCalls) {
+  const toolInfo = tools.find(t => t.name === tool);
+  if (!toolInfo) {
+    results.push({ tool, error: 'Tool not found in tools.json' });
+    continue;
+  }
 
-    const BACKEND_URL = 'https://doc-mcp.onrender.com';
-    const results = [];
+  try {
+    const apiURL = `${BACKEND_URL}${toolInfo.endpoint}`;
+    const result = await axios({
+      method: toolInfo.method.toLowerCase(),
+      url: apiURL,
+      data: params
+    });
+    results.push(result.data);
+  } catch (err) {
+    results.push({ tool, error: err.message });
+  }
+}
 
-    for (const { tool, params } of toolCalls) {
-      const toolInfo = tools.find(t => t.name === tool);
-      if (!toolInfo) {
-        results.push({ tool, error: 'Tool not found in tools.json' });
-        continue;
-      }
+return res.json({ results });
 
-      try {
-        const apiURL = `${BACKEND_URL}${toolInfo.endpoint}`;
-        const result = await axios({
-          method: toolInfo.method.toLowerCase(),
-          url: apiURL,
-          data: params
-        });
-        results.push(result.data);
-      } catch (err) {
-        results.push({ tool, error: err.message });
-      }
-    }
-
-    return res.json({ results });
 
   } catch (err) {
     return res.status(500).json({ error: 'askLLM failed: ' + err.message });
   }
+
+
 };
 
 exports.viewAvailableDoctors = async (req, res) => {

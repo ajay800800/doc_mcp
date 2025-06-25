@@ -274,25 +274,43 @@ You are working with a PostgreSQL database named "mcp". It contains:
 
 🔍 Important SQL rules:
 - To find doctors available at a given time, use:
-  SELECT * FROM doctors WHERE available_slots @> '[\"10:00\"]';
 
-✅ Valid SQL example:
-  "query": "SELECT * FROM doctors WHERE available_slots @> '[\\\"10:00\\\"]';"
+  
+
+✅ Valid SQL example  To find doctors available at a given time, use: in json object  for  query  (SELECT * FROM doctors WHERE available_slots @> '[\"10:00\"]');
+:
+ {
+  "tool": "execute-sql",
+  "params": {
+    "db_name": "mcp",
+    "query": "SELECT * FROM doctors WHERE available_slots @> '[\\\"10:00\\\"]';"
+  }
+}
+
 
 ❌ DO NOT USE:
 - JavaScript string concatenation: '" + time + "'
 - Over-escaped JSON like '[\\'10:00\\']'
 - Single-quoted values inside JSON array
 - Any "+" signs or mixing of variables in SQL
+  VALUES ('2', '5', '[\"11:00\"]');       -- ❌ Escaped JSON not needed for a plain string column
+  SELECT * FROM doctors WHERE available_slots @> '[" + time + "]';       -- ❌ JS-style concat
+  SELECT * FROM doctors WHERE available_slots @> '['11:00']';            -- ❌ Single quotes inside JSON
+  SELECT * FROM doctors WHERE available_slots @> '[\\"11:00\\"]';        -- ❌ Over-escaped
+
+ 
+
+
+
+- INSERT  in doctors should be like:
+  "query": "INSERT INTO doctors (name, department, available_slots) VALUES ('shreya', 'ortho', '[\\\"12:00\\\", \\\"13:00\\\"]');"
+insert into  appointmnets
+  "query": "INSERT INTO appointments (doctor_id, patient_id, appointment_time) VALUES (2, 5, '12:00');"
+focus in doctor table- it has jsonB as column type and not text like in appointment table so keeep in mind what queery to returrn :
 
 ✅ Always return a plain SQL string as value of "query", inside:
-  {
-    "tool": "tool-name",
-    "params": {
-      "db_name": "mcp",
-      "query": "valid SQL here"
-    }
-  }
+  
+    
 
 📦 Response format:
 Return ONLY   a **pure JSON array  of only one Tool   ** (no markdown, no explanations) like one tool query can be run when required.
@@ -302,7 +320,8 @@ Return ONLY   a **pure JSON array  of only one Tool   ** (no markdown, no explan
   {
     "tool": "tool-name",
     "params": {
-      ...
+      "db_name": "mcp",
+      "query": "valid SQL here"
     }
   }
 ]
